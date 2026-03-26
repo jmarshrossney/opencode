@@ -2,6 +2,7 @@ import { useSync } from "@tui/context/sync"
 import { createMemo, For, Show, Switch, Match } from "solid-js"
 import { createStore } from "solid-js/store"
 import { useTheme } from "../../context/theme"
+import { Link } from "@tui/ui/link"
 import { Locale } from "@/util/locale"
 import path from "path"
 import type { AssistantMessage } from "@opencode-ai/sdk/v2"
@@ -137,9 +138,14 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
               <text fg={theme.textMuted}>{cost()} spent</text>
             </box>
             <box>
-              <text fg={theme.text}>
-                <b>Footprint</b>
-              </text>
+              <box flexDirection="row" justifyContent="space-between" width="100%">
+                <text fg={theme.text}>
+                  <b>Footprint</b>
+                </text>
+                <Link href="https://example.com/methodology" fg={theme.primary}>
+                  {"(?)"}
+                </Link>
+              </box>
               <text fg={theme.textMuted}>
                 ≈{energy().energyWh.toFixed(2)} mWh ({energyToPhoneCharges(energy().energyWh).toFixed(2)} phone charges)
               </text>
