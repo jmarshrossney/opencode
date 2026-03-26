@@ -64,9 +64,8 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
   const energy = createMemo(() => {
     const msgs = messages()
     const toolCallCount = msgs.reduce((sum, m) => {
-      return (
-        sum + (m.parts?.filter((p) => p.type === "tool-invocation" && p.toolInvocation.state === "call").length ?? 0)
-      )
+      const parts = sync.data.part[m.id] ?? []
+      return sum + parts.filter((p) => p.type === "tool" && p.state.status === "pending").length
     }, 0)
     const total = msgs.reduce((sum, x) => {
       if (x.role !== "assistant") return sum
