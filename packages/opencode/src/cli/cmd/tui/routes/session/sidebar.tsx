@@ -11,7 +11,7 @@ import { useKeybind } from "../../context/keybind"
 import { useDirectory } from "../../context/directory"
 import { useKV } from "../../context/kv"
 import { TodoItem } from "../../component/todo-item"
-import { estimateEnergy, carbonToMiles } from "@/session/energy"
+import { estimateEnergy, carbonToMiles, energyToPhoneCharges } from "@/session/energy"
 
 export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
   const sync = useSync()
@@ -140,9 +140,12 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
               <text fg={theme.text}>
                 <b>Footprint</b>
               </text>
-              <text fg={theme.textMuted}>≈{energy().energyWh.toFixed(2)} mWh</text>
-              <text fg={theme.textMuted}>≈{energy().carbonGCO2e.toFixed(0)} mgCO₂e</text>
-              <text fg={theme.textMuted}>≈{carbonToMiles(energy().carbonGCO2e).toFixed(1)} miles</text>
+              <text fg={theme.textMuted}>
+                ≈{energy().energyWh.toFixed(2)} mWh ({energyToPhoneCharges(energy().energyWh).toFixed(2)} phone charges)
+              </text>
+              <text fg={theme.textMuted}>
+                ≈{energy().carbonGCO2e.toFixed(0)} mgCO₂e ({carbonToMiles(energy().carbonGCO2e).toFixed(1)} car miles)
+              </text>
             </box>
             <Show when={mcpEntries().length > 0}>
               <box>

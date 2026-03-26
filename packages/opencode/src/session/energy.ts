@@ -88,6 +88,14 @@ export function estimateEnergy(input: EnergyInput): EnergyResult {
   return { energyWh, carbonGCO2e }
 }
 
+// Energy for a typical smartphone full charge (~20 Wh)
+// Based on average 5000mAh battery at 3.8V (19 Wh, rounded to 20 for charging inefficiencies)
+const SMARTPHONE_CHARGE_MWH = 20000
+
+export function energyToPhoneCharges(energyMWh: number): number {
+  return energyMWh / SMARTPHONE_CHARGE_MWH
+}
+
 // Convert carbon footprint to miles driven equivalence
 // Based on EPA average passenger vehicle emissions: ~0.35 kg CO2e per mile
 // Source: EPA "Emission Factors for Greenhouse Gas Inventories" (2024)
