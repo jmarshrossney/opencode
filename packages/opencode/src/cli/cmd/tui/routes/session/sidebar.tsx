@@ -65,22 +65,29 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
     const msgs = messages()
     const toolCallCount = msgs.reduce((sum, m) => {
       const parts = sync.data.part[m.id] ?? []
-      return sum + parts.filter((p) => p.type === "tool" && p.state.status === "pending").length
+      return sum + parts.filter((p) => p.type === "tool" && p.state.status === "completed").length
     }, 0)
-    const total = msgs.reduce((sum, x) => {
-      if (x.role !== "assistant") return sum
-      return (
-        sum +
-        estimateEnergy({
+    const result = msgs.reduce(
+      (sum, x) => {
+        if (x.role !== "assistant") return sum
+        const provider = sync.data.provider.find((p) => p.id === x.providerID)
+        const region = provider?.options?.region as string | undefined
+        const r = estimateEnergy({
           tokens: x.tokens,
           providerID: x.providerID,
           modelID: x.modelID,
+          region: region,
           timestamp: x.time.created,
           toolCalls: toolCallCount,
         })
-      )
-    }, 0)
-    return total.toLocaleString()
+        return {
+          energyWh: sum.energyWh + r.energyWh,
+          carbonGCO2e: sum.carbonGCO2e + r.carbonGCO2e,
+        }
+      },
+      { energyWh: 0, carbonGCO2e: 0 },
+    )
+    return result
   })
 
   const directory = useDirectory()
@@ -128,7 +135,8 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
               <text fg={theme.textMuted}>{context()?.tokens ?? 0} tokens</text>
               <text fg={theme.textMuted}>{context()?.percentage ?? 0}% used</text>
               <text fg={theme.textMuted}>{cost()} spent</text>
-              <text fg={theme.textMuted}>{energy()} energy</text>
+              <text fg={theme.textMuted}>≈{energy().energyWh.toFixed(2)} mWh</text>
+              <text fg={theme.textMuted}>≈{energy().carbonGCO2e.toFixed(0)} mgCO₂e</text>
             </box>
             <Show when={mcpEntries().length > 0}>
               <box>
