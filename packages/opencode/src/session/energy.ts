@@ -33,6 +33,10 @@ const CI_G_CO2_PER_WH: Record<string, number> = {
   default: 0.475,
 }
 
+const CO2E_PER_MILE_KG = 0.35
+
+// Fixed energy cost per tool call (0.1 mWh = 0.0001 Wh)
+// Placeholder value - Stage 2 will use actual tool execution time
 const E_TOOL_WH = 0.0001
 
 export interface EnergyInput {
@@ -82,4 +86,13 @@ export function estimateEnergy(input: EnergyInput): EnergyResult {
   const carbonGCO2e = energyWh * ci * 1000
 
   return { energyWh, carbonGCO2e }
+}
+
+// Convert carbon footprint to miles driven equivalence
+// Based on EPA average passenger vehicle emissions: ~0.35 kg CO2e per mile
+// Source: EPA "Emission Factors for Greenhouse Gas Inventories" (2024)
+// This shows how many miles would need to be driven in an average car
+// to produce the same amount of CO2e
+export function carbonToMiles(carbonGCO2e: number): number {
+  return carbonGCO2e / 1_000_000 / CO2E_PER_MILE_KG
 }
