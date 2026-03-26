@@ -11,6 +11,7 @@ import { useKeybind } from "../../context/keybind"
 import { useDirectory } from "../../context/directory"
 import { useKV } from "../../context/kv"
 import { TodoItem } from "../../component/todo-item"
+import { estimateEnergy } from "@/session/energy"
 
 export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
   const sync = useSync()
@@ -60,6 +61,29 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
     }
   })
 
+  const energy = createMemo(() => {
+    const msgs = messages()
+    const toolCallCount = msgs.reduce((sum, m) => {
+      return (
+        sum + (m.parts?.filter((p) => p.type === "tool-invocation" && p.toolInvocation.state === "call").length ?? 0)
+      )
+    }, 0)
+    const total = msgs.reduce((sum, x) => {
+      if (x.role !== "assistant") return sum
+      return (
+        sum +
+        estimateEnergy({
+          tokens: x.tokens,
+          providerID: x.providerID,
+          modelID: x.modelID,
+          timestamp: x.time.created,
+          toolCalls: toolCallCount,
+        })
+      )
+    }, 0)
+    return total.toLocaleString()
+  })
+
   const directory = useDirectory()
   const kv = useKV()
 
@@ -105,6 +129,7 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
               <text fg={theme.textMuted}>{context()?.tokens ?? 0} tokens</text>
               <text fg={theme.textMuted}>{context()?.percentage ?? 0}% used</text>
               <text fg={theme.textMuted}>{cost()} spent</text>
+              <text fg={theme.textMuted}>{energy()} energy</text>
             </box>
             <Show when={mcpEntries().length > 0}>
               <box>
