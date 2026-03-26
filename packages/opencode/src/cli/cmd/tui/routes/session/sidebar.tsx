@@ -135,6 +135,11 @@ export function Sidebar(props: { sessionID: string; overlay?: boolean }) {
               <text fg={theme.textMuted}>{context()?.tokens ?? 0} tokens</text>
               <text fg={theme.textMuted}>{context()?.percentage ?? 0}% used</text>
               <text fg={theme.textMuted}>{cost()} spent</text>
+            </box>
+            <box>
+              <text fg={theme.text}>
+                <b>Footprint</b>
+              </text>
               <text fg={theme.textMuted}>≈{energy().energyWh.toFixed(2)} mWh</text>
               <text fg={theme.textMuted}>≈{energy().carbonGCO2e.toFixed(0)} mgCO₂e</text>
               <text fg={theme.textMuted}>≈{carbonToMiles(energy().carbonGCO2e).toFixed(1)} miles</text>
